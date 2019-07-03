@@ -2,7 +2,7 @@
   "name": "magecomp/module-extraFee",
   "description": "A Magento 2 module that adds extra fee at checkout",
   "type": "magento2-module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": [
     "OSL-3.0",
     "AFL-3.0"

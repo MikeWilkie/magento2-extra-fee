@@ -37,10 +37,7 @@ class Fee extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
             return $this;
         }
 
-        $enabled = $this->helperData->isModuleEnabled();
-        $minimumOrderAmount = $this->helperData->getMinimumOrderAmount();
-        $subtotal = $total->getTotalAmount('subtotal');
-        if ($enabled && $minimumOrderAmount <= $subtotal) {
+        if ($this->helperData->shouldApplyFee($total)) {
             $fee = $quote->getFee();
             $total->setTotalAmount('fee', $fee);
             $total->setBaseTotalAmount('fee', $fee);
@@ -59,12 +56,8 @@ class Fee extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
      */
     public function fetch(\Magento\Quote\Model\Quote $quote, \Magento\Quote\Model\Quote\Address\Total $total)
     {
-
-        $enabled = $this->helperData->isModuleEnabled();
-        $minimumOrderAmount = $this->helperData->getMinimumOrderAmount();
-        $subtotal = $quote->getSubtotal();
         $fee = $quote->getFee();
-        if ($enabled && $minimumOrderAmount <= $subtotal && $fee) {
+        if ($this->helperData->shouldApplyFee($total) && $fee) {
             return [
                 'code' => 'fee',
                 'title' => 'Custom Fee',
@@ -90,9 +83,6 @@ class Fee extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
      */
     protected function clearValues(\Magento\Quote\Model\Quote\Address\Total $total)
     {
-       // $enabled = $this->helperData->isModuleEnabled();
-       // $minimumOrderAmount = $this->helperData->getMinimumOrderAmount();
-       // $subtotal = $total->getTotalAmount('subtotal');
         $total->setTotalAmount('subtotal', 0);
         $total->setBaseTotalAmount('subtotal', 0);
         $total->setTotalAmount('tax', 0);

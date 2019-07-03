@@ -43,14 +43,11 @@ class ExtrafeeConfigProvider implements ConfigProviderInterface
     public function getConfig()
     {
         $ExtrafeeConfig = [];
-        $enabled = $this->dataHelper->isModuleEnabled();
-        $minimumOrderAmount = $this->dataHelper->getMinimumOrderAmount();
         $ExtrafeeConfig['fee_label'] = $this->dataHelper->getFeeLabel();
         $quote = $this->checkoutSession->getQuote();
-        $subtotal = $quote->getSubtotal();
         $ExtrafeeConfig['custom_fee_amount'] = $this->dataHelper->getExtrafee();
-        $ExtrafeeConfig['show_hide_Extrafee_block'] = ($enabled && ($minimumOrderAmount <= $subtotal) && $quote->getFee()) ? true : false;
-        $ExtrafeeConfig['show_hide_Extrafee_shipblock'] = ($enabled && ($minimumOrderAmount <= $subtotal)) ? true : false;
+        $ExtrafeeConfig['show_hide_Extrafee_block'] = ($this->dataHelper->shouldApplyFee($total) && $quote->getFee()) ? true : false;
+        $ExtrafeeConfig['show_hide_Extrafee_shipblock'] = ($this->dataHelper->shouldApplyFee($total)) ? true : false;
         return $ExtrafeeConfig;
     }
 }

@@ -39,20 +39,22 @@ class Fee extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
             return $this;
         }
 
-        $enabled = $this->helperData->isModuleEnabled();
-        $minimumOrderAmount = $this->helperData->getMinimumOrderAmount();
-        $subtotal = $total->getTotalAmount('subtotal');
-        if ($enabled && $minimumOrderAmount <= $subtotal) {
+        if ($this->helperData->shouldApplyFee($total)) {
             $fee = $this->helperData->getExtrafee();
-            //Try to test with sample value
-            //$fee=50;
             $total->setTotalAmount('fee', $fee);
             $total->setBaseTotalAmount('fee', $fee);
             $total->setFee($fee);
             $quote->setFee($fee);
-            $total->setGrandTotal($total->getGrandTotal() + $fee);
-        
-		   
+			
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface');
+            $version = (float)$productMetadata->getVersion();
+
+            if($version <= 2.1)
+            {
+                $total->setGrandTotal($total->getGrandTotal() + $fee);
+            }
+			
 		}
         return $this;
     }
@@ -64,14 +66,10 @@ class Fee extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
      */
     public function fetch(\Magento\Quote\Model\Quote $quote, \Magento\Quote\Model\Quote\Address\Total $total)
     {
-
-        $enabled = $this->helperData->isModuleEnabled();
-        $minimumOrderAmount = $this->helperData->getMinimumOrderAmount();
-        $subtotal = $quote->getSubtotal();
         $fee = $quote->getFee();
 
         $result = [];
-        if ($enabled && ($minimumOrderAmount <= $subtotal) && $fee) {
+        if ($this->helperData->shouldApplyFee($total) && $fee) {
             $result = [
                 'code' => 'fee',
                 'title' => $this->helperData->getFeeLabel(),

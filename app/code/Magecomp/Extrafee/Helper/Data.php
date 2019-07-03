@@ -3,6 +3,7 @@
 namespace Magecomp\Extrafee\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Quote\Model\Quote;
 
 class Data extends AbstractHelper
 {
@@ -19,7 +20,6 @@ class Data extends AbstractHelper
      */
     public function isModuleEnabled()
     {
-
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $isEnabled = $this->scopeConfig->getValue(self::CONFIG_CUSTOM_IS_ENABLED, $storeScope);
         return $isEnabled;
@@ -58,5 +58,21 @@ class Data extends AbstractHelper
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $MinimumOrderAmount = $this->scopeConfig->getValue(self::CONFIG_MINIMUM_ORDER_AMOUNT, $storeScope);
         return $MinimumOrderAmount;
+    }
+
+    /**
+     * Return true if the fee should be applied, else otherwise.
+     * @param Quote\Address\Total $total The order's total.
+     * @return bool true if the fee should be applied, else otherwise.
+     */
+    public function shouldApplyFee(\Magento\Quote\Model\Quote\Address\Total $total)
+    {
+        // Customize to you need.
+
+        $enabled = $this->isModuleEnabled();
+        $minimumOrderAmount = $this->getMinimumOrderAmount();
+        $subtotal = $total->getTotalAmount('subtotal');
+
+        return $enabled && $minimumOrderAmount <= $subtotal;
     }
 }
