@@ -2,8 +2,6 @@
 
 namespace Magecomp\Extrafee\Model\Total;
 
-use Magento\Store\Model\ScopeInterface;
-
 class Fee extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
 {
 
